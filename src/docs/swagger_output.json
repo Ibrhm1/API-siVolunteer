@@ -907,6 +907,13 @@
             "schema": {
               "type": "number"
             }
+          },
+          {
+            "name": "isPublish",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
           }
         ],
         "responses": {

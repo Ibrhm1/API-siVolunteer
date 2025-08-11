@@ -69,12 +69,10 @@ export default {
   async getEventById(req: IReqUser, res: Response) {
     try {
       const { id } = req.params;
-
       if (!isValidObjectId(id))
         return response.notFound(res, 'Id event not found');
 
       const result = await EventModel.findById(id);
-
       if (!result) return response.notFound(res, 'Event not found');
 
       response.success(res, result, 'Success get event by id');
@@ -102,7 +100,6 @@ export default {
         return response.notFound(res, 'Event not found');
 
       const event = await EventModel.findById(id);
-
       const payload: TypeEvent = {
         ...req.body,
         location: {
@@ -127,7 +124,6 @@ export default {
   async deleteEvent(req: IReqUser, res: Response) {
     try {
       const { id } = req.params;
-
       if (!isValidObjectId(id))
         return response.notFound(res, 'Event not found');
 
@@ -143,9 +139,7 @@ export default {
     try {
       const { slug } = req.params;
       const result = await EventModel.findOne({ slug });
-
       if (!result) return response.notFound(res, 'Event not found');
-
       response.success(res, result, 'Success get event by slug');
     } catch (error) {
       response.error(res, error, 'Failed get event by slug');

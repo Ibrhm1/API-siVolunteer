@@ -359,6 +359,7 @@ router.get(
     #swagger.tags = ['Frequently Asked Questions'],
     #swagger.parameters['limit'] = { in: 'query', type: 'number', default: 10 }
     #swagger.parameters['page'] = { in: 'query', type: 'number', default: 1 }
+    #swagger.parameters['isPublish'] = { in: 'query', type: 'boolean' }
   */
 );
 router.get(
