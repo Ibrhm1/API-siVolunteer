@@ -3,6 +3,7 @@ import { IPaginationQuery, IReqUser } from '../utils/interfaces';
 import response from '../utils/response';
 import EventModel, { EventDAO, TypeEvent } from '../models/events.model';
 import { FilterQuery, isValidObjectId } from 'mongoose';
+import uploader from '../utils/uploader';
 
 export default {
   async createEvent(req: IReqUser, res: Response) {
@@ -130,6 +131,8 @@ export default {
       const result = await EventModel.findByIdAndDelete(id, {
         new: true,
       });
+      if (!result) return response.notFound(res, 'Event not found');
+      await uploader.remove(result?.image);
       response.success(res, result, 'Success delete event');
     } catch (error) {
       response.error(res, error, 'Failed delete event');

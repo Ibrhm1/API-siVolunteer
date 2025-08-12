@@ -3,6 +3,7 @@ import { IPaginationQuery, IReqUser } from '../utils/interfaces';
 import response from '../utils/response';
 import CategoryModel, { categoryDAO } from '../models/categories.model';
 import { isValidObjectId } from 'mongoose';
+import uploader from '../utils/uploader';
 
 export default {
   async createCategory(req: IReqUser, res: Response) {
@@ -78,7 +79,7 @@ export default {
         new: true,
       });
       if (!result) return response.notFound(res, 'Category not found');
-
+      await uploader.remove(result?.image);
       response.success(res, result, 'Success update category');
     } catch (error) {
       const err = error as unknown as Error;
