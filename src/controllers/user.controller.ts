@@ -8,6 +8,7 @@ import { IPaginationQuery, IReqUser } from '../utils/interfaces';
 import response from '../utils/response';
 import { isValidObjectId } from 'mongoose';
 import { ROLES } from '../utils/constant';
+import uploader from '../utils/uploader';
 
 export default {
   async register(req: Request, res: Response) {
@@ -39,7 +40,6 @@ export default {
         address,
         phone,
       });
-
       response.success(res, user, 'Success registration');
     } catch (error) {
       const err = error as unknown as Error;
@@ -55,7 +55,6 @@ export default {
         .skip((page - 1) * limit)
         .sort({ createdAt: -1 })
         .exec();
-
       const count = await UserModel.countDocuments({ role: 'member' });
       response.pagination(
         res,
@@ -91,6 +90,9 @@ export default {
       const userId = req.user?.id;
       if (!userId) return response.notFound(res, 'User not found');
       const { fullName, profilePicture, phone, address } = req.body;
+      const user = await UserModel.findById(userId);
+      if (!user) return response.notFound(res, 'User not found');
+
       const result = await UserModel.findByIdAndUpdate(
         userId,
         {
@@ -105,6 +107,7 @@ export default {
       );
       if (!result) return response.notFound(res, 'User not found');
 
+      if(profilePicture ) 
       response.success(res, result, 'Success update profile');
     } catch (error) {
       const err = error as unknown as Error;

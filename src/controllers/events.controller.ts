@@ -117,7 +117,6 @@ export default {
       const result = await EventModel.findByIdAndUpdate(id, payload, {
         new: true,
       });
-      await uploader.remove(event?.image);
       response.success(res, result, 'Success update event');
     } catch (error) {
       response.error(res, error, 'Failed update event');
