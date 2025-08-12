@@ -79,7 +79,6 @@ export default {
         new: true,
       });
       if (!result) return response.notFound(res, 'Category not found');
-      await uploader.remove(result?.image);
       response.success(res, result, 'Success update category');
     } catch (error) {
       const err = error as unknown as Error;
@@ -94,7 +93,7 @@ export default {
 
       const result = await CategoryModel.findByIdAndDelete(id, { new: true });
       if (!result) return response.notFound(res, 'Category not found');
-
+      await uploader.remove(result?.image);
       response.success(res, result, 'Success delete category');
     } catch (error) {
       const err = error as unknown as Error;
