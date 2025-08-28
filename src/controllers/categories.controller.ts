@@ -71,16 +71,18 @@ export default {
   },
   async updateCategory(req: IReqUser, res: Response) {
     try {
+      const { name, image, description } = req.body;
       const { id } = req.params;
       if (!isValidObjectId(id))
         return response.notFound(res, 'Category not found');
 
-      // const category = await CategoryModel.findById(id);
-      // if (!category) return response.notFound(res, 'Category not found');
-
-      const result = await CategoryModel.findByIdAndUpdate(id, req.body, {
-        new: true,
-      });
+      const result = await CategoryModel.findByIdAndUpdate(
+        id,
+        { name, image, description },
+        {
+          new: true,
+        }
+      );
       if (!result) return response.notFound(res, 'Category not found');
       response.success(res, result, 'Success update category');
     } catch (error) {

@@ -90,9 +90,6 @@ export default {
       const userId = req.user?.id;
       if (!userId) return response.notFound(res, 'User not found');
       const { fullName, profilePicture, phone, address } = req.body;
-      const user = await UserModel.findById(userId);
-      if (!user) return response.notFound(res, 'User not found');
-
       const result = await UserModel.findByIdAndUpdate(
         userId,
         {
@@ -105,10 +102,11 @@ export default {
           new: true,
         }
       );
-      if (!result) return response.notFound(res, 'User not found');
-
-      if(profilePicture ) 
-      response.success(res, result, 'Success update profile');
+      if (!result) {
+        return response.notFound(res, 'User not found');
+      } else {
+        return response.success(res, result, 'Success update profile');
+      }
     } catch (error) {
       const err = error as unknown as Error;
       response.error(res, error, err.message);
