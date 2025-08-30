@@ -119,6 +119,7 @@ router.put(
     }
   */
 );
+router.delete('/member/:id', authMiddleware, userController.deleteUser);
 
 //* routes organizer
 router.post(

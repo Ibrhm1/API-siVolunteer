@@ -9,6 +9,8 @@ import response from '../utils/response';
 import { isValidObjectId } from 'mongoose';
 import { ROLES } from '../utils/constant';
 import uploader from '../utils/uploader';
+import EventVolunteerModel from '../models/eventVolunteer.model';
+import EventModel from '../models/events.model';
 
 export default {
   async register(req: Request, res: Response) {
@@ -139,6 +141,39 @@ export default {
     } catch (error) {
       const err = error as unknown as Error;
       response.error(res, error, err.message);
+    }
+  },
+  async deleteUser(req: IReqUser, res: Response) {
+    try {
+      const { id } = req.params;
+      if (!isValidObjectId(id)) {
+        return response.notFound(res, 'Id is not valid');
+      }
+
+      const user = await UserModel.findById(id);
+      if (!user) {
+        return response.notFound(res, 'User not found');
+      }
+      const userEventVolunteers = await EventVolunteerModel.find({
+        userId: id,
+      });
+
+      // kalau ada event yang diikuti user, kurangi currentVolunteer dari event terkait
+      for (const ev of userEventVolunteers) {
+        await EventModel.findByIdAndUpdate(ev.eventId, {
+          $inc: { currentVolunteer: -1 },
+        });
+      }
+      await EventVolunteerModel.deleteMany({ userId: id });
+      const result = await UserModel.findByIdAndDelete(id);
+      return response.success(
+        res,
+        result,
+        'User and related data deleted successfully'
+      );
+    } catch (error) {
+      const err = error as Error;
+      return response.error(res, error, err.message);
     }
   },
 };
