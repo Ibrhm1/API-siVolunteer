@@ -17,14 +17,13 @@ export default {
     }
   },
   async getCategory(req: IReqUser, res: Response) {
-    const {
-      limit = 10,
-      page = 1,
-      search,
-    } = req.query as unknown as IPaginationQuery;
-
     try {
       const query = {};
+      const {
+        limit = 10,
+        page = 1,
+        search,
+      } = req.query as unknown as IPaginationQuery;
       if (search) {
         Object.assign(query, {
           ...query,
@@ -37,7 +36,6 @@ export default {
         .skip((page - 1) * limit)
         .sort({ createdAt: -1 })
         .exec();
-
       const count = await CategoryModel.countDocuments(query);
       response.pagination(
         res,

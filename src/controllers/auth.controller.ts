@@ -52,8 +52,6 @@ export default {
       return response.error(res, error, err.message);
     }
   },
-
-
   async getProfile(req: IReqUser, res: Response) {
     try {
       const user = req.user;

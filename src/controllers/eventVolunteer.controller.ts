@@ -7,6 +7,7 @@ import EventVolunteerModel, {
 } from '../models/eventVolunteer.model';
 import { FilterQuery, isValidObjectId } from 'mongoose';
 import EventModel from '../models/events.model';
+import OrganizerModel from '../models/organizers.model';
 
 export default {
   async createEventVolunteer(req: IReqUser, res: Response) {
@@ -14,7 +15,7 @@ export default {
       const { eventId } = req.params;
       if (!isValidObjectId(eventId))
         return response.notFound(res, 'Event not found');
-      //* ambil event berdasarkan id yang dipilih
+
       const event = await EventModel.findById(eventId);
       if (!event) return response.notFound(res, 'Event not found');
       //* cek current volunteer
@@ -45,7 +46,6 @@ export default {
         },
         { new: true }
       );
-
       const result = await EventVolunteerModel.create(payload);
       if (!result) return response.notFound(res, 'EventVolunteer not found');
       response.success(res, result, 'Success create eventVolunteer');
@@ -68,7 +68,7 @@ export default {
 
       const result = await EventVolunteerModel.find(query)
         .populate('userId', 'fullName email phone profilePicture')
-        .populate('eventId')
+        .populate('eventId', 'name slug description location image')
         .limit(+limit)
         .skip((+page - 1) * +limit)
         .sort({ createdAt: -1 })
@@ -98,13 +98,15 @@ export default {
     try {
       const userId = req.user?.id;
       const result = await EventVolunteerModel.find({ userId, ...query })
-        .populate('userId', 'fullName email phone profilePicture')
-        .populate('eventId')
+        .populate('eventId', 'name slug description location image')
         .limit(+limit)
         .skip((+page - 1) * +limit)
         .sort({ createdAt: -1 })
         .exec();
-      const count = await EventVolunteerModel.countDocuments(query);
+      const count = await EventVolunteerModel.countDocuments({
+        userId,
+        ...query,
+      });
       response.pagination(
         res,
         result,
@@ -128,7 +130,6 @@ export default {
 
       const result = await EventVolunteerModel.find({ eventId })
         .populate('userId', 'fullName email phone profilePicture')
-        .populate('eventId')
         .lean();
       if (!result) return response.notFound(res, 'Event Volunteer not found');
 
