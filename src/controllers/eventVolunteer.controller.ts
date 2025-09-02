@@ -67,6 +67,8 @@ export default {
       const query = buildQuery({ eventId, userId });
 
       const result = await EventVolunteerModel.find(query)
+        .populate('userId', 'fullName email phone profilePicture')
+        .populate('eventId')
         .limit(+limit)
         .skip((+page - 1) * +limit)
         .sort({ createdAt: -1 })
@@ -96,6 +98,8 @@ export default {
     try {
       const userId = req.user?.id;
       const result = await EventVolunteerModel.find({ userId, ...query })
+        .populate('userId', 'fullName email phone profilePicture')
+        .populate('eventId')
         .limit(+limit)
         .skip((+page - 1) * +limit)
         .sort({ createdAt: -1 })
@@ -122,7 +126,10 @@ export default {
       if (!isValidObjectId(eventId))
         return response.notFound(res, 'Id is not valid');
 
-      const result = await EventVolunteerModel.find({ eventId });
+      const result = await EventVolunteerModel.find({ eventId })
+        .populate('userId', 'fullName email phone profilePicture')
+        .populate('eventId')
+        .lean();
       if (!result) return response.notFound(res, 'Event Volunteer not found');
 
       response.success(res, result, 'Success get eventVolunteer');

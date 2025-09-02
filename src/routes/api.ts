@@ -283,7 +283,7 @@ router.get(
 router.get(
   '/events/organizers',
   [authMiddleware, aclMiddleware([ROLES.ORGANIZER])],
-  eventsController.getEventByOrganizer
+  eventsController.getMyEventOrganizer
   /*
     #swagger.tags = ['Events'],
     #swagger.security = [{ "bearerAuth": {} }]
@@ -300,7 +300,7 @@ router.get(
 );
 router.get(
   '/events/createdBy/:organizerId',
-  eventsController.getEventByOrganzer
+  eventsController.getEventByOrganizerId
   /*
     #swagger.tags = ['Events'],
    */

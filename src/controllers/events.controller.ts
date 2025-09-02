@@ -47,6 +47,8 @@ export default {
       });
 
       const result = await EventModel.find(query)
+        .populate('createdBy', 'organizerName email')
+        .populate('currentVolunteers', 'fullName email phone profilePicture')
         .limit(+limit)
         .skip((+page - 1) * +limit)
         .sort({ createdAt: -1 })
@@ -73,7 +75,10 @@ export default {
       if (!isValidObjectId(id))
         return response.notFound(res, 'Id event not found');
 
-      const result = await EventModel.findById(id);
+      const result = await EventModel.findById(id)
+        .populate('createdBy', 'organizerName email')
+        .populate('currentVolunteers', 'fullName email phone profilePicture')
+        .lean();
       if (!result) return response.notFound(res, 'Event not found');
 
       response.success(res, result, 'Success get event by id');
@@ -81,13 +86,15 @@ export default {
       response.error(res, error, 'Failed get event by id');
     }
   },
-  async getEventByOrganzer(req: IReqUser, res: Response) {
+  async getEventByOrganizerId(req: IReqUser, res: Response) {
     try {
       const { organizerId } = req.params;
       if (!isValidObjectId(organizerId))
         return response.notFound(res, 'Organizer not found');
 
-      const result = await EventModel.find({ createdBy: organizerId });
+      const result = await EventModel.find({ createdBy: organizerId })
+        .populate('createdBy', 'organizerName email')
+        .populate('currentVolunteers', 'fullName email phone profilePicture');
       if (!result) return response.notFound(res, 'Event not found');
       response.success(res, result, 'Success get event by organizer');
     } catch (error) {
@@ -141,14 +148,16 @@ export default {
   async getEventBySlug(req: IReqUser, res: Response) {
     try {
       const { slug } = req.params;
-      const result = await EventModel.findOne({ slug });
+      const result = await EventModel.findOne({ slug })
+        .populate('createdBy', 'organizerName email')
+        .populate('currentVolunteers', 'fullName email phone profilePicture');
       if (!result) return response.notFound(res, 'Event not found');
       response.success(res, result, 'Success get event by slug');
     } catch (error) {
       response.error(res, error, 'Failed get event by slug');
     }
   },
-  async getEventByOrganizer(req: IReqUser, res: Response) {
+  async getMyEventOrganizer(req: IReqUser, res: Response) {
     const {
       limit = 10,
       page = 1,
@@ -166,11 +175,16 @@ export default {
         });
       }
       const result = await EventModel.find({ createdBy: organizerId, ...query })
+        .populate('createdBy', 'organizerName email')
+        .populate('currentVolunteers', 'fullName email phone profilePicture')
         .limit(+limit)
         .skip((+page - 1) * +limit)
         .sort({ createdAt: -1 })
         .exec();
-      const count = await EventModel.countDocuments(result);
+      const count = await EventModel.countDocuments({
+        createdBy: organizerId,
+        ...query,
+      });
       response.pagination(
         res,
         result,
