@@ -49,6 +49,7 @@ export default {
       const result = await EventModel.find(query)
         .populate('createdBy', 'organizerName email')
         .populate('currentVolunteers', 'fullName email phone profilePicture')
+        .populate('category', 'name')
         .limit(+limit)
         .skip((+page - 1) * +limit)
         .sort({ createdAt: -1 })
@@ -78,6 +79,7 @@ export default {
       const result = await EventModel.findById(id)
         .populate('createdBy', 'organizerName email')
         .populate('currentVolunteers', 'fullName email phone profilePicture')
+        .populate('category', 'name')
         .lean();
       if (!result) return response.notFound(res, 'Event not found');
 
@@ -94,7 +96,8 @@ export default {
 
       const result = await EventModel.find({ createdBy: organizerId })
         .populate('createdBy', 'organizerName email')
-        .populate('currentVolunteers', 'fullName email phone profilePicture');
+        .populate('currentVolunteers', 'fullName email phone profilePicture')
+        .populate('category', 'name');
       if (!result) return response.notFound(res, 'Event not found');
       response.success(res, result, 'Success get event by organizer');
     } catch (error) {
@@ -150,7 +153,8 @@ export default {
       const { slug } = req.params;
       const result = await EventModel.findOne({ slug })
         .populate('createdBy', 'organizerName email')
-        .populate('currentVolunteers', 'fullName email phone profilePicture');
+        .populate('currentVolunteers', 'fullName email phone profilePicture')
+        .populate('category', 'name');
       if (!result) return response.notFound(res, 'Event not found');
       response.success(res, result, 'Success get event by slug');
     } catch (error) {
@@ -177,6 +181,7 @@ export default {
       const result = await EventModel.find({ createdBy: organizerId, ...query })
         .populate('createdBy', 'organizerName email')
         .populate('currentVolunteers', 'fullName email phone profilePicture')
+        .populate('category', 'name')
         .limit(+limit)
         .skip((+page - 1) * +limit)
         .sort({ createdAt: -1 })
